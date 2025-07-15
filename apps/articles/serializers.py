@@ -5,7 +5,9 @@ from apps.tags.models import Tag
 
 
 class ArticleSerializer(serializers.ModelSerializer):
-    tags = serializers.ListField(child=serializers.CharField(), write_only=True)
+    tags = serializers.ListField(
+        child=serializers.CharField(), write_only=True
+    )
     tag_list = serializers.SerializerMethodField()
     author = serializers.SerializerMethodField()
 
