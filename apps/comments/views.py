@@ -1,3 +1,7 @@
-from django.shortcuts import render
+# class CommentViewSet(CustomResponseMixin, viewsets.ModelViewSet):
+#     """
+#     A simple ViewSet for viewing and editing comments.
+#     """
 
-# Create your views here.
+#     queryset = Comment.objects.all()
+#     serializer_class = CommentSerializer

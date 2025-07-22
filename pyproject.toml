@@ -1,13 +1,36 @@
 [tool.ruff]
-target-version = "py310"
+target-version = "py311"
 line-length = 79
-select = ["E", "W", "N", "F", "I", "B"]
-ignore = ["E501"]
+select = [
+    "E",    # pycodestyle (PEP8)
+    "F",    # pyflakes
+    "B",    # bugbear
+    "I",    # isort rules (optional but dope)
+    "DJ",   # Django rules
+    "C4",   # comprehensions
+    "UP",   # pyupgrade
+]
 
+exclude = [
+    ".git",
+    "__pycache__",
+    "migrations",
+    "venv",
+    ".venv",
+    "build",
+    "dist",
+]
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+docstring-code-format = true
+line-ending = "lf"
+
+[tool.ruff.isort]
+force-sort-within-sections = true
+combine-as-imports = true
+relative-imports-order = "closest-to-furthest"
 
 [tool.ruff.lint.isort]
 split-on-trailing-comma = true

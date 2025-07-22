@@ -1,0 +1,9 @@
+{
+  "python.analysis.packageIndexDepths": [
+    {
+      "name": "",
+      "depth": 8,
+      "includeAllSymbols": true
+    }
+  ]
+}

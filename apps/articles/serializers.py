@@ -1,37 +1,56 @@
 from rest_framework import serializers
 
-from apps.articles.models import Article
 from apps.tags.models import Tag
+
+from .models import Article
+
+
+class TagsField(serializers.Field):
+    """
+    Custom field to handle tags for both input and output
+    """
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault("required", False)
+        super().__init__(**kwargs)
+
+    def to_representation(self, value):
+        """Convert tags to output format"""
+        return [tag.name for tag in value.all()]
+
+    def to_internal_value(self, data):
+        """Convert input data to internal format"""
+        if not isinstance(data, list):
+            raise serializers.ValidationError("Tags must be a list")
+
+        for item in data:
+            if not isinstance(item, str):
+                raise serializers.ValidationError("Each tag must be a string")
+
+        return data
 
 
 class ArticleSerializer(serializers.ModelSerializer):
-    tags = serializers.ListField(
-        child=serializers.CharField(), write_only=True
-    )
-    tag_list = serializers.SerializerMethodField()
+    tags = TagsField()
     author = serializers.SerializerMethodField()
 
     class Meta:
         model = Article
         fields = [
+            "id",
             "slug",
             "title",
             "description",
+            "body",
             "tags",
-            "tag_list",
+            "author",
             "created_at",
             "updated_at",
-            "author",
         ]
-        read_only_fields = ["id", "created_at", "updated_at"]
-        extra_kwargs = {
-            "slug": {"required": False},
-        }
-
-    def get_tag_list(self, obj):
-        return [{"name": tag.name} for tag in obj.tags.all()]
+        read_only_fields = ["id", "created_at", "updated_at", "slug"]
 
     def get_author(self, obj):
+        print(obj.author)
         return {
             "username": obj.author.username,
             "bio": obj.author.bio,
@@ -41,10 +60,30 @@ class ArticleSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         tag_names = validated_data.pop("tags", [])
         article = Article.objects.create(**validated_data)
-        tag_objs = []
-        for name in tag_names:
-            tag, _ = Tag.objects.get_or_create(name=name)
-            tag_objs.append(tag)
 
-        article.tags.set(tag_objs)
+        if tag_names:
+            tag_objs = []
+            for name in tag_names:
+                tag, _ = Tag.objects.get_or_create(name=name)
+                tag_objs.append(tag)
+            article.tags.set(tag_objs)
+
         return article
+
+    def update(self, instance, validated_data):
+        tag_names = validated_data.pop("tags", [])
+
+        # Update article fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        # Update tags
+        if tag_names:
+            tag_objs = []
+            for name in tag_names:
+                tag, _ = Tag.objects.get_or_create(name=name)
+                tag_objs.append(tag)
+            instance.tags.set(tag_objs)
+
+        return instance

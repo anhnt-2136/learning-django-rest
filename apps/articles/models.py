@@ -1,30 +1,32 @@
 from django.db import models
 from slugify import slugify
 
+from apps.core.mixins import StrReprMixin
+from apps.core.models import WithTimestampsMixin
 from apps.tags.models import Tag
 from apps.users.models import User
 
 
-class Article(models.Model):
+class Article(WithTimestampsMixin, StrReprMixin):
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True)
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, default="")
     body = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
+    class Meta(WithTimestampsMixin.Meta):
         ordering = ["-id"]
 
-    def __str__(self):
-        return self.title
-
     def save(self, *args, **kwargs):
-        self.author = User.objects.first()  # TODO: Implement logic to set the author based on the request context
+        # TODO: Implement logic to set the author based on the request context
+        user = User.objects.first()
+        if not user:
+            raise ValueError(
+                "Cannot create article: No users exist in the database"
+            )
+        self.author = user
 
-        print("Model.save()", self.author)
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
