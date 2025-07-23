@@ -18,20 +18,30 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
-from rest_framework import routers
+from rest_framework.routers import DefaultRouter
+from rest_framework_nested.routers import NestedDefaultRouter
 
 from apps.articles.views import ArticleViewSet
+from apps.comments.views import CommentViewSet
 from apps.tags.views import TagViewSet
 from apps.users.views import UserViewSet
 
-router = routers.DefaultRouter(trailing_slash=False)
-router.register("users", UserViewSet, basename="users")
-router.register("tags", TagViewSet, basename="tags")
-router.register("articles", ArticleViewSet, basename="articles")
+router = DefaultRouter(trailing_slash=False)
+router.register("users", UserViewSet)
+router.register("tags", TagViewSet)
+router.register("articles", ArticleViewSet)
+
+comments_router = NestedDefaultRouter(router, "articles", lookup="article")
+comments_router.register(
+    "comments",
+    CommentViewSet,
+    basename="article-comments",
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
+    path("api/", include(comments_router.urls)),
     path(
         "api/auth/",
         include("rest_framework.urls", namespace="rest_framework"),

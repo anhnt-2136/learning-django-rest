@@ -7,9 +7,17 @@ from apps.users.models import User
 
 
 class Comment(WithTimestampsMixin, StrReprMixin):
-    article = models.ForeignKey(Article, on_delete=models.CASCADE)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
+    article = models.ForeignKey(
+        Article,
+        on_delete=models.CASCADE,
+        related_name="comments",
+    )
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="comments",
+    )
 
     class Meta(WithTimestampsMixin.Meta):
         ordering = ["-id"]

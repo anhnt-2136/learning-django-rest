@@ -12,8 +12,12 @@ class Article(WithTimestampsMixin, StrReprMixin):
     slug = models.SlugField(max_length=255, unique=True)
     description = models.TextField(blank=True, default="")
     body = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    tags = models.ManyToManyField(Tag)
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="articles",
+    )
+    tags = models.ManyToManyField(Tag, related_name="articles")
 
     class Meta(WithTimestampsMixin.Meta):
         ordering = ["-id"]
