@@ -1,12 +1,12 @@
-from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
-from realworld.mixins import CustomResponseMixin
+from apps.core.mixins import CustomModelViewSet
 
 from .models import Article
 from .serializers import ArticleSerializer
 
 
-class ArticleViewSet(CustomResponseMixin, viewsets.ModelViewSet):
+class ArticleViewSet(CustomModelViewSet):
     """
     A simple ViewSet for viewing and editing articles.
     """
@@ -14,3 +14,4 @@ class ArticleViewSet(CustomResponseMixin, viewsets.ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
     lookup_field = "slug"
+    permission_classes = [IsAuthenticated]

@@ -1,14 +1,15 @@
-from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
+from apps.core.mixins import CustomReadOnlyModelViewSet
 from apps.tags.models import Tag
 from apps.tags.serializers import TagSerializer
-from realworld.mixins import CustomResponseMixin
 
 
-class TagViewSet(CustomResponseMixin, viewsets.ModelViewSet):
+class TagViewSet(CustomReadOnlyModelViewSet):
     """
     A simple ViewSet for viewing and editing tags.
     """
 
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = [IsAuthenticated]

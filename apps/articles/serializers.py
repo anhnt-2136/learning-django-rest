@@ -47,7 +47,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "created_at", "updated_at", "slug"]
+        read_only_fields = ["id", "created_at", "updated_at", "slug", "author"]
 
     def get_author(self, obj):
         print(obj.author)
@@ -58,6 +58,8 @@ class ArticleSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
+        user = self.context["request"].user
+        validated_data["author"] = user
         tag_names = validated_data.pop("tags", [])
         article = Article.objects.create(**validated_data)
 

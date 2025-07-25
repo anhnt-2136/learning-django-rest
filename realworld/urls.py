@@ -20,6 +20,10 @@ from django.urls import path
 from django.urls.conf import include
 from rest_framework.routers import DefaultRouter
 from rest_framework_nested.routers import NestedDefaultRouter
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 from apps.articles.views import ArticleViewSet
 from apps.comments.views import CommentViewSet
@@ -43,7 +47,18 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("api/", include(comments_router.urls)),
     path(
-        "api/auth/",
-        include("rest_framework.urls", namespace="rest_framework"),
+        "api/login",
+        TokenObtainPairView.as_view(),
+        name="token_obtain_pair",
+    ),
+    path(
+        "api/token/refresh",
+        TokenRefreshView.as_view(),
+        name="token_refresh",
+    ),
+    path(
+        "api/register",
+        UserViewSet.as_view({"post": "register"}),
+        name="user-register",
     ),
 ]

@@ -1,19 +1,19 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
 from apps.articles.models import Article
 from apps.comments.models import Comment
 from apps.comments.serializers import CommentSerializer
-from apps.users.models import User
-from realworld.mixins import CustomResponseMixin
+from apps.core.mixins import CustomModelViewSet
 
 
-class CommentViewSet(CustomResponseMixin, viewsets.ModelViewSet):
+class CommentViewSet(CustomModelViewSet):
     """
     A simple ViewSet for viewing and editing comments.
     """
 
     serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):  # pyright: ignore[reportIncompatibleMethodOverride]
         return Comment.objects.filter(
@@ -23,4 +23,4 @@ class CommentViewSet(CustomResponseMixin, viewsets.ModelViewSet):
     def perform_create(self, serializer):
         article_slug = self.kwargs.get("article_slug")
         article = get_object_or_404(Article, slug=article_slug)
-        serializer.save(article=article, owner=User.objects.first())
+        serializer.save(article=article, owner=self.request.user)

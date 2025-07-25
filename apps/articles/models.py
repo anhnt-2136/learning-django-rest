@@ -23,14 +23,6 @@ class Article(WithTimestampsMixin, StrReprMixin):
         ordering = ["-id"]
 
     def save(self, *args, **kwargs):
-        # TODO: Implement logic to set the author based on the request context
-        user = User.objects.first()
-        if not user:
-            raise ValueError(
-                "Cannot create article: No users exist in the database"
-            )
-        self.author = user
-
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
