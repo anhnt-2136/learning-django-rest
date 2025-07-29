@@ -26,12 +26,13 @@ from rest_framework_simplejwt.views import (
 )
 
 from apps.articles.views import ArticleViewSet
+from apps.articles_favorites.views import ArticleFavoritesViewSet
 from apps.comments.views import CommentViewSet
+from apps.registration.views import UserRegistrationViewSet
 from apps.tags.views import TagViewSet
 from apps.users.views import UserViewSet
 
 router = DefaultRouter(trailing_slash=False)
-router.register("users", UserViewSet)
 router.register("tags", TagViewSet)
 router.register("articles", ArticleViewSet)
 
@@ -42,10 +43,23 @@ comments_router.register(
     basename="article-comments",
 )
 
+articles_favorites_router = NestedDefaultRouter(
+    router,
+    "articles",
+    lookup="article",
+)
+articles_favorites_router.register(
+    "favorites",
+    ArticleFavoritesViewSet,
+    basename="article-favorites",
+)
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include(router.urls)),
     path("api/", include(comments_router.urls)),
+    path("api/", include(articles_favorites_router.urls)),
+    path("api/user", UserViewSet.as_view(), name="current-user"),
     path(
         "api/login",
         TokenObtainPairView.as_view(),
@@ -58,7 +72,7 @@ urlpatterns = [
     ),
     path(
         "api/register",
-        UserViewSet.as_view({"post": "register"}),
+        UserRegistrationViewSet.as_view(),
         name="user-register",
     ),
 ]

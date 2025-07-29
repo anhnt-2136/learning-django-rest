@@ -50,7 +50,6 @@ class ArticleSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "created_at", "updated_at", "slug", "author"]
 
     def get_author(self, obj):
-        print(obj.author)
         return {
             "username": obj.author.username,
             "bio": obj.author.bio,

@@ -83,7 +83,8 @@ class CustomUpdateMixin(BaseResponseMixin, mixins.UpdateModelMixin):
 class CustomDestroyMixin(BaseResponseMixin, mixins.DestroyModelMixin):
     """
     Mixin to format destroy responses with {data: ...} structure.
-    Must be used with BaseResponseMixin and a ViewSet that has destroy() method.
+    Must be used with BaseResponseMixin and a ViewSet that has destroy()
+    method.
     """
 
     def destroy(self, request, *args, **kwargs):
@@ -116,6 +117,15 @@ class CustomReadOnlyModelViewSet(
     """
     Mixin to format read-only responses with {data: ...} structure.
     This is useful for ViewSets that only support list and retrieve operations.
+    """
+
+    pass
+
+
+class CustomGenericViewSet(BaseResponseMixin, GenericViewSet):
+    """
+    Mixin that formats all CRUD responses with {data: ...} structure.
+    This is useful for ViewSets that support all CRUD operations.
     """
 
     pass

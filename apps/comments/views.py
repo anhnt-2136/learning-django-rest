@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from apps.articles.models import Article
 from apps.comments.models import Comment
+from apps.comments.permissions import IsCommentOwner, IsMatchArticleSlug
 from apps.comments.serializers import CommentSerializer
 from apps.core.mixins import CustomModelViewSet
 
@@ -13,7 +14,7 @@ class CommentViewSet(CustomModelViewSet):
     """
 
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsMatchArticleSlug, IsCommentOwner]
 
     def get_queryset(self):  # pyright: ignore[reportIncompatibleMethodOverride]
         return Comment.objects.filter(
