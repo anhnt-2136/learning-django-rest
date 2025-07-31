@@ -28,15 +28,19 @@ from rest_framework_simplejwt.views import (
 from apps.articles.views import ArticleViewSet
 from apps.articles_favorites.views import ArticleFavoritesViewSet
 from apps.comments.views import CommentViewSet
+from apps.profiles.views import ProfileViewSet
 from apps.registration.views import UserRegistrationViewSet
 from apps.tags.views import TagViewSet
-from apps.users.views import UserViewSet
+from apps.users.views import UserFollowingView, UserViewSet
 
-router = DefaultRouter(trailing_slash=False)
-router.register("tags", TagViewSet)
-router.register("articles", ArticleViewSet)
+default_router = DefaultRouter(trailing_slash=False)
+default_router.register("tags", TagViewSet)
+default_router.register("articles", ArticleViewSet)
+default_router.register("profiles", ProfileViewSet)
 
-comments_router = NestedDefaultRouter(router, "articles", lookup="article")
+comments_router = NestedDefaultRouter(
+    default_router, "articles", lookup="article"
+)
 comments_router.register(
     "comments",
     CommentViewSet,
@@ -44,7 +48,7 @@ comments_router.register(
 )
 
 articles_favorites_router = NestedDefaultRouter(
-    router,
+    default_router,
     "articles",
     lookup="article",
 )
@@ -56,10 +60,15 @@ articles_favorites_router.register(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include(router.urls)),
+    path("api/", include(default_router.urls)),
     path("api/", include(comments_router.urls)),
     path("api/", include(articles_favorites_router.urls)),
     path("api/user", UserViewSet.as_view(), name="current-user"),
+    path(
+        "api/user/following",
+        UserFollowingView.as_view(),
+        name="user-following",
+    ),
     path(
         "api/login",
         TokenObtainPairView.as_view(),

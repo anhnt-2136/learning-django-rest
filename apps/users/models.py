@@ -35,3 +35,16 @@ class User(WithTimestampsMixin, StrReprMixin, AbstractBaseUser):
 
     class Meta(WithTimestampsMixin.Meta):
         ordering = ["-id"]
+
+
+class UserFollowing(WithTimestampsMixin, StrReprMixin):
+    user = models.ForeignKey(
+        User, related_name="following", on_delete=models.CASCADE
+    )
+    following_user = models.ForeignKey(
+        User, related_name="followers", on_delete=models.CASCADE
+    )
+
+    class Meta(WithTimestampsMixin.Meta):
+        unique_together = ("user", "following_user")
+        ordering = ["-id"]
